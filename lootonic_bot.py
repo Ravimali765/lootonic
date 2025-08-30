@@ -4,20 +4,23 @@ import os
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
 
-# ===== CONFIG (Render Environment Variables) =====
-API_ID = os.getenv("API_ID")
-API_HASH = os.getenv("API_HASH")
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+# ===== CONFIG =====
+API_ID = int(os.getenv("API_ID", "28039031"))
+API_HASH = os.getenv("API_HASH", "fa809cd93f897a41fddc91df5cac9480")
+BOT_TOKEN = os.getenv("BOT_TOKEN")  # Render me set karo, warna local test ke liye None
 
-if not API_ID or not API_HASH or not BOT_TOKEN:
-    raise ValueError("❌ API_ID, API_HASH or BOT_TOKEN missing in environment variables!")
+SOURCE_CHANNELS = [
+    "@Classickweb",
+    "@check00221",
+    "@TrickXpert",
+    "@realearnkaro",
+    "@magixdeals",
+    "@dealspoint"
+]
 
-API_ID = int(API_ID)
-
-SOURCE_CHANNELS = os.getenv("SOURCE_CHANNELS", "@Classickweb,@check00221,@TrickXpert,@realearnkaro,@magixdeals,@dealspoint").split(",")
-TARGET_CHANNEL = os.getenv("TARGET_CHANNEL", "@lootonic")
-CONVERTER_BOT = os.getenv("CONVERTER_BOT", "@lootonic_bot")
-POST_INTERVAL = int(os.getenv("POST_INTERVAL", 60))
+TARGET_CHANNEL = "@lootonic"
+CONVERTER_BOT = "@lootonic_bot"
+POST_INTERVAL = 60  # seconds between posts
 
 # ===== TELEGRAM CLIENT =====
 client = TelegramClient(StringSession(), API_ID, API_HASH).start(bot_token=BOT_TOKEN)
@@ -26,7 +29,7 @@ client = TelegramClient(StringSession(), API_ID, API_HASH).start(bot_token=BOT_T
 async def convert_link(original_url):
     try:
         await client.send_message(CONVERTER_BOT, original_url)
-        await asyncio.sleep(5)
+        await asyncio.sleep(5)  # wait for bot reply
         async for message in client.iter_messages(CONVERTER_BOT, limit=1):
             return message.text.strip()
     except Exception as e:
@@ -34,7 +37,7 @@ async def convert_link(original_url):
         return original_url
 
 def extract_urls(text):
-    return re.findall(r"(https?://[^\s]+)", text or "")
+    return re.findall(r'(https?://[^\s]+)', text or "")
 
 async def post_to_channel(msg, caption):
     try:
@@ -72,3 +75,4 @@ async def handler(event):
 # ===== RUN BOT =====
 print("🚀 Lootonic Auto-Poster Running...")
 client.run_until_disconnected()
+
