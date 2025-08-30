@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Product 1",
+    "image": "https://i.imgur.com/example1.jpg",
+    "affiliate_url": "https://earnkaro.com?r=4570824&fname=indus+cricket&url=https://flipkart.com/product1"
+  },
+  {
+    "name": "Product 2",
+    "image": "https://i.imgur.com/example2.jpg",
+    "affiliate_url": "https://earnkaro.com?r=4570824&fname=indus+cricket&url=https://amazon.com/product2"
+  }
+]
