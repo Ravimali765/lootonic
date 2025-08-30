@@ -1,46 +1,26 @@
 import re
 import asyncio
+import os
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
 from keep_alive import keep_alive
-import os
-import time
-from telegram import Bot
 
 keep_alive()
 
-# ===== CONFIG =====
+# ===== CONFIG (Read from Render Environment Variables) =====
 API_ID = int(os.getenv("API_ID"))
 API_HASH = os.getenv("API_HASH")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-USER_CHAT_ID = int(os.getenv("USER_CHAT_ID"))
-POST_INTERVAL = int(os.getenv("POST_INTERVAL", 60))
-SOURCE_CHANNELS = os.getenv("SOURCE_CHANNELS").split(",")
+
+SOURCE_CHANNELS = os.getenv("SOURCE_CHANNELS", "").split(",")
 TARGET_CHANNEL = os.getenv("TARGET_CHANNEL")
 CONVERTER_BOT = os.getenv("CONVERTER_BOT")
+POST_INTERVAL = int(os.getenv("POST_INTERVAL", 60))
 
 # ===== TELEGRAM CLIENT =====
 client = TelegramClient(StringSession(), API_ID, API_HASH).start(bot_token=BOT_TOKEN)
 
-# ===== TELEGRAM BOT FOR OTP =====
-bot = Bot(token=BOT_TOKEN)
-
-def request_otp():
-    bot.send_message(USER_CHAT_ID, "Please enter OTP for login:")
-    otp = None
-    print("⏳ Waiting for OTP from Telegram user...")
-    while otp is None:
-        try:
-            updates = bot.get_updates(timeout=5)
-            for update in updates:
-                if update.message and update.message.chat.id == USER_CHAT_ID:
-                    otp = update.message.text.strip()
-                    bot.send_message(USER_CHAT_ID, f"✅ OTP received: {otp}")
-                    return otp
-        except Exception:
-            time.sleep(2)
-
-# ===== LINK CONVERSION =====
+# ===== FUNCTIONS =====
 async def convert_link(original_url):
     try:
         await client.send_message(CONVERTER_BOT, original_url)
@@ -51,11 +31,9 @@ async def convert_link(original_url):
         print(f"❌ Link conversion error: {e}")
         return original_url
 
-# ===== URL EXTRACT =====
 def extract_urls(text):
     return re.findall(r"(https?://[^\s]+)", text or "")
 
-# ===== SAFE POSTING =====
 async def post_to_channel(msg, caption):
     try:
         if msg.photo:
@@ -68,7 +46,7 @@ async def post_to_channel(msg, caption):
     except Exception as e:
         print(f"❌ Error posting: {e}")
 
-# ===== HANDLER =====
+# ===== EVENT HANDLER =====
 @client.on(events.NewMessage(chats=SOURCE_CHANNELS))
 async def handler(event):
     msg = event.message
@@ -80,8 +58,7 @@ async def handler(event):
 
     converted_urls = []
     for url in urls:
-        converted = await convert_link(url)
-        converted_urls.append(converted)
+        converted_urls.append(await convert_link(url))
 
     caption = msg.text
     for original, conv in zip(urls, converted_urls):
@@ -90,8 +67,6 @@ async def handler(event):
     await post_to_channel(msg, caption)
     await asyncio.sleep(POST_INTERVAL)
 
-# ===== RUN CLIENT =====
+# ===== RUN BOT =====
 print("🚀 Lootonic Auto-Poster Running...")
 client.run_until_disconnected()
-
-
