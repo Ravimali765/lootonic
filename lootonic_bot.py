@@ -8,6 +8,7 @@ keep_alive()
 # ===== CONFIG =====
 API_ID = 28039031
 API_HASH = "fa809cd93f897a41fddc91df5cac9480"
+BOT_TOKEN = "8346429967:AAHuuBZmYf7Yd9twpmbIpRH2odwp__7uLXo"
 
 # Source channels se messages lene ke liye
 SOURCE_CHANNELS = ["@Classickweb", "@check00221"]
@@ -16,11 +17,11 @@ TARGET_CHANNEL = "@lootonic"
 CONVERTER_BOT = "@lootonic_bot"
 POST_INTERVAL = 60  # seconds between posts
 
-# ===== TELEGRAM CLIENT =====
-client = TelegramClient("lootonic_user", API_ID, API_HASH)
+# ===== TELEGRAM BOT CLIENT =====
+client = TelegramClient("lootonic_bot", API_ID, API_HASH).start(bot_token=BOT_TOKEN)
 
 
-# Link conversion via @ekconverter1bot
+# Link conversion via converter bot
 async def convert_link(original_url):
     try:
         await client.send_message(CONVERTER_BOT, original_url)
@@ -39,7 +40,7 @@ def extract_urls(text):
     return re.findall(r'(https?://[^\s]+)', text or "")
 
 
-# Safe posting (fix for photo/text/webpage issue)
+# Safe posting
 async def post_to_channel(msg, caption):
     try:
         if msg.photo:  # agar image hai
@@ -85,10 +86,10 @@ async def handler(event):
 
 # ===== RUN CLIENT =====
 async def main():
-    await client.start()  # user login first time
-    print("🚀 Lootonic Auto-Poster Running...")
+    print("🚀 Lootonic Auto-Poster Bot Running...")
     await client.run_until_disconnected()
 
 
 asyncio.run(main())
+
 
