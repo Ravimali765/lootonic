@@ -1,18 +1,17 @@
-from flask import Flask, render_template
-from threading import Thread
+from flask import Flask
+import threading
+import os
 
-app = Flask(__name__)
-
+app = Flask('')
 
 @app.route('/')
-def index():
-  return "alive"
-
+def home():
+    return "Bot is running!"
 
 def run():
-  app.run(host="0.0.0.0", port=8080)
-
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
 
 def keep_alive():
-  t = Thread(target=run)
-  t.start
+    t = threading.Thread(target=run)
+    t.start()
