@@ -1,16 +1,16 @@
 import re
 import asyncio
 from telethon import TelegramClient, events
+from keep_alive import keep_alive
+
+keep_alive()
 
 # ===== CONFIG =====
 API_ID = 28039031
 API_HASH = "fa809cd93f897a41fddc91df5cac9480"
 
 # Source channels se messages lene ke liye
-SOURCE_CHANNELS = [
-    "@Classickweb",
-    "@check00221"
-]
+SOURCE_CHANNELS = ["@Classickweb", "@check00221"]
 
 TARGET_CHANNEL = "@lootonic"
 CONVERTER_BOT = "@lootonic_bot"
@@ -45,7 +45,9 @@ async def post_to_channel(msg, caption):
         if msg.photo:  # agar image hai
             await client.send_file(TARGET_CHANNEL, msg.photo, caption=caption)
         elif msg.document:  # agar koi file hai
-            await client.send_file(TARGET_CHANNEL, msg.document, caption=caption)
+            await client.send_file(TARGET_CHANNEL,
+                                   msg.document,
+                                   caption=caption)
         else:  # sirf text / webpage
             await client.send_message(TARGET_CHANNEL, caption)
         print(f"✅ Posted message to {TARGET_CHANNEL}")
@@ -89,3 +91,4 @@ async def main():
 
 
 asyncio.run(main())
+
