@@ -14,13 +14,10 @@ if not API_ID or not API_HASH or not BOT_TOKEN:
 
 API_ID = int(API_ID)
 
-SOURCE_CHANNELS = os.getenv("SOURCE_CHANNELS", "").split(",")
-TARGET_CHANNEL = os.getenv("TARGET_CHANNEL")
-CONVERTER_BOT = os.getenv("CONVERTER_BOT")
+SOURCE_CHANNELS = os.getenv("SOURCE_CHANNELS", "@Classickweb,@check00221,@TrickXpert,@realearnkaro,@magixdeals,@dealspoint").split(",")
+TARGET_CHANNEL = os.getenv("TARGET_CHANNEL", "@lootonic")
+CONVERTER_BOT = os.getenv("CONVERTER_BOT", "@lootonic_bot")
 POST_INTERVAL = int(os.getenv("POST_INTERVAL", 60))
-
-if not SOURCE_CHANNELS or not TARGET_CHANNEL or not CONVERTER_BOT:
-    raise ValueError("❌ SOURCE_CHANNELS, TARGET_CHANNEL or CONVERTER_BOT missing!")
 
 # ===== TELEGRAM CLIENT =====
 client = TelegramClient(StringSession(), API_ID, API_HASH).start(bot_token=BOT_TOKEN)
@@ -75,4 +72,3 @@ async def handler(event):
 # ===== RUN BOT =====
 print("🚀 Lootonic Auto-Poster Running...")
 client.run_until_disconnected()
-
